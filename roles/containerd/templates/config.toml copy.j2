@@ -75,9 +75,7 @@ version = 2
       max_conf_num = 1
 
     [plugins."io.containerd.grpc.v1.cri".containerd]
-{% if nvidia_gpu == "true" %}
       default_runtime_name = "nvidia"
-{% endif %}
       disable_snapshot_annotations = true
       discard_unpacked_layers = false
       ignore_rdt_not_enabled_errors = false
@@ -96,7 +94,7 @@ version = 2
         [plugins."io.containerd.grpc.v1.cri".containerd.default_runtime.options]
 
       [plugins."io.containerd.grpc.v1.cri".containerd.runtimes]
-{% if nvidia_gpu == "true" %}
+
         [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.nvidia]
           privileged_without_host_devices = false
           runtime_engine = ""
@@ -104,7 +102,6 @@ version = 2
           runtime_type = "io.containerd.runc.v2"
           [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.nvidia.options]
             BinaryName = "/usr/bin/nvidia-container-runtime"
-{% endif %}
 
         [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
           base_runtime_spec = ""
@@ -174,7 +171,7 @@ version = 2
         [plugins."io.containerd.grpc.v1.cri".registry.mirrors."nvcr.io"]
           endpoint = ["https://ngc.nju.edu.cn"]
         [plugins."io.containerd.grpc.v1.cri".registry.mirrors."registry.k8s.io"]
-          endpoint = ["https://66x1ic6b.mirror.aliyuncs.com"]
+          endpoint = ["http://easzlab.io.local:5000"]
 {% endif %}
 
     [plugins."io.containerd.grpc.v1.cri".x509_key_pair_streaming]

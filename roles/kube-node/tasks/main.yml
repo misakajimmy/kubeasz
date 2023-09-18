@@ -106,7 +106,7 @@
   shell: "systemctl is-active kubelet.service"
   register: kubelet_status
   until: '"active" in kubelet_status.stdout'
-  retries: 4
+  retries: 16
   delay: 2
   tags: reload-kube-proxy, upgrade_k8s, restart_node, force_change_certs
 
@@ -114,7 +114,7 @@
   shell: "{{ base_dir }}/bin/kubectl get node {{ K8S_NODENAME }}|awk 'NR>1{print $2}'"
   register: node_status
   until: node_status.stdout == "Ready" or node_status.stdout == "Ready,SchedulingDisabled"
-  retries: 8 
+  retries: 32
   delay: 8
   tags: upgrade_k8s, restart_node, force_change_certs
   connection: local

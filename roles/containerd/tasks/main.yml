@@ -18,6 +18,26 @@
       - "{{ base_dir }}/bin/containerd-bin/*"
       tags: upgrade
 
+    - name: Copy NVIDIA GPG key
+      template: src=nvidia_gpg.key.j2 dest=/tmp/nvidia_gpg.key
+    
+    - name: Add NVIDIA GPG key
+      shell: cat /tmp/nvidia_gpg.key | apt-key add -
+      ignore_errors: true
+      
+    - name: Add NVIDIA repository
+      template: src=libnvidia-container.list.j2 dest=/etc/apt/sources.list.d/libnvidia-container.list
+
+    - name: Update APT cache
+      apt:
+        update_cache: yes
+
+    - name: Install NVIDIA container toolkit
+      apt:
+        name: nvidia-container-toolkit
+        state: present
+        update_cache: yes
+
     - name: 下载 crictl
       copy: src={{ base_dir }}/bin/crictl dest={{ bin_dir }}/crictl mode=0755
 
@@ -39,6 +59,10 @@
     - name: 创建 crictl 配置
       template: src=crictl.yaml.j2 dest=/etc/crictl.yaml
 
+    - name: nvidia-ctk 设置runtime
+      command: nvidia-ctk runtime configure --runtime=containerd
+      when: nvidia_gpu == "true"
+
     - name: 开机启用 containerd 服务
       shell: systemctl enable containerd
       ignore_errors: true
@@ -51,7 +75,7 @@
       shell: "systemctl is-active containerd.service"
       register: containerd_status
       until: '"active" in containerd_status.stdout'
-      retries: 8
+      retries: 16
       delay: 2
       tags: upgrade
   when: "'NoFound' in containerd_svc.stdout"
